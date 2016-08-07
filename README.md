@@ -25,6 +25,7 @@ This project is inspired from kahopoon's [Pokemon-Go-Controller](https://github.
     - **Remember to uncheck "Copy file to project" !!!**
   - On your iOS device, press home and open **Maps** app for verification
   - in **Xcode** menu bar, click **Debug** -> **Simulate Location** -> Select **MapWalker**. Your location in **Maps** app should be moved to the latest location in MapWalker app.
+    - If nothing can be selected in **Simulate Location** menu, make sure you are switched to "LocationSimulation" project window in Xcode and the app is running and is run from Xcode.
   - Switch back to **MapWalker** app, use arrow keys to move on the maps and see if your location in Maps app on iOS device is also moved.
     - If your location in **Maps** app is not moved, check the following **Troubleshooting** part.
 
@@ -35,7 +36,7 @@ Troubleshooting
   - And also make sure the active document in the window is LocationSimulation project file
     - Single-click on the first item in project navigator
   - Make sure Xcode is allowed to control your computer in **Settings** -> **Security & Privacy** -> **Accessibility**.
-  - Make sure LocationSimulation project is running on your device
+  - Make sure LocationSimulation project is running on your device and **is run from Xcode**
 
 License
 ----
