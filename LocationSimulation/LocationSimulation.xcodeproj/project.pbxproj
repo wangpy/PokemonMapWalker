@@ -14,7 +14,6 @@
 		E1E018891D577842009EFBDF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E1E018871D577842009EFBDF /* LaunchScreen.storyboard */; };
 		E1E018941D577842009EFBDF /* LocationSimulationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E018931D577842009EFBDF /* LocationSimulationTests.swift */; };
 		E1E0189F1D577843009EFBDF /* LocationSimulationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E0189E1D577843009EFBDF /* LocationSimulationUITests.swift */; };
-		E1E018B01D5785A5009EFBDF /* MapWalker.gpx in Resources */ = {isa = PBXBuildFile; fileRef = E1E018AF1D5785A5009EFBDF /* MapWalker.gpx */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,7 +47,6 @@
 		E1E0189A1D577843009EFBDF /* LocationSimulationUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LocationSimulationUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1E0189E1D577843009EFBDF /* LocationSimulationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSimulationUITests.swift; sourceTree = "<group>"; };
 		E1E018A01D577843009EFBDF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E1E018AF1D5785A5009EFBDF /* MapWalker.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = MapWalker.gpx; path = "../../../../Library/Developer/Xcode/DerivedData/MapWalker-cavbffrolknqnzainenlntlfuruj/Build/Products/Debug/MapWalker.gpx"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,7 +77,6 @@
 		E1E018721D577842009EFBDF = {
 			isa = PBXGroup;
 			children = (
-				E1E018AF1D5785A5009EFBDF /* MapWalker.gpx */,
 				E1E0187D1D577842009EFBDF /* LocationSimulation */,
 				E1E018921D577842009EFBDF /* LocationSimulationTests */,
 				E1E0189D1D577843009EFBDF /* LocationSimulationUITests */,
@@ -234,7 +231,6 @@
 			files = (
 				E1E018891D577842009EFBDF /* LaunchScreen.storyboard in Resources */,
 				E1E018861D577842009EFBDF /* Assets.xcassets in Resources */,
-				E1E018B01D5785A5009EFBDF /* MapWalker.gpx in Resources */,
 				E1E018841D577842009EFBDF /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
