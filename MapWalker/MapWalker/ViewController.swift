@@ -12,7 +12,7 @@ import Dispatch
 
 class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDelegate {
 
-  let headingDelta:CLLocationDirection = 15.0
+  let headingDelta:CLLocationDirection = 3.0
   let moveDelta:CLLocationDegrees = 0.0001
   
   var heading:CLLocationDirection = 0.0
@@ -236,12 +236,12 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
   }
 
   override func moveLeft(sender: AnyObject?) {
-    heading -= headingDelta / 5.0
+    heading -= headingDelta
     updateCamera()
   }
 
   override func moveRight(sender: AnyObject?) {
-    heading += headingDelta / 5.0
+    heading += headingDelta
     updateCamera()
   }
 }
