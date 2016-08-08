@@ -54,14 +54,21 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     let adjustedRegion = mapView.regionThatFits(viewRegion)
     mapView.setRegion(adjustedRegion, animated: true)
  */
-    updateCamera()
+    updateCamera(false)
     let url = NSURL(fileURLWithPath: "MapWalker.gpx")
     let folderUrl = url.URLByDeletingLastPathComponent
     NSWorkspace.sharedWorkspace().openURL(folderUrl!)
   }
 
-  func updateCamera() {
-    let camera = MKMapCamera(lookingAtCenterCoordinate: centerCoordinate, fromDistance: 500, pitch: 45, heading: heading)
+  func updateCamera(mapInitialized:Bool = true) {
+    var distance = 500.0
+    if mapInitialized {
+        distance = mapView.camera.altitude / cos(M_PI*(Double(mapView.camera.pitch)/180.0))
+    }
+    let camera = MKMapCamera(lookingAtCenterCoordinate: centerCoordinate,
+                             fromDistance: distance,
+                             pitch: 45,
+                             heading: heading)
     mapView.camera = camera
     makeGPXFile()
   }
@@ -150,13 +157,26 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     switch (Int(keyValue)) {
     case NSUpArrowFunctionKey:
       keyDownList.insert(NSUpArrowFunctionKey)
-      
     case NSDownArrowFunctionKey:
       keyDownList.insert(NSDownArrowFunctionKey)
     case NSLeftArrowFunctionKey:
       keyDownList.insert(NSLeftArrowFunctionKey)
     case NSRightArrowFunctionKey:
       keyDownList.insert(NSRightArrowFunctionKey)
+
+    case Int((String("w").unicodeScalars.first?.value)!):
+      keyDownList.insert(NSUpArrowFunctionKey)
+    case Int((String("s").unicodeScalars.first?.value)!):
+      keyDownList.insert(NSDownArrowFunctionKey)
+    case Int((String("a").unicodeScalars.first?.value)!):
+      keyDownList.insert(NSLeftArrowFunctionKey)
+    case Int((String("d").unicodeScalars.first?.value)!):
+      keyDownList.insert(NSRightArrowFunctionKey)
+
+    case Int((String("=").unicodeScalars.first?.value)!):
+      keyDownList.insert(Int((String("=").unicodeScalars.first?.value)!))
+    case Int((String("-").unicodeScalars.first?.value)!):
+      keyDownList.insert(Int((String("+").unicodeScalars.first?.value)!))
     default:
       super.keyDown(event)
       return
@@ -182,30 +202,46 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
       keyDownList.remove(NSLeftArrowFunctionKey)
     case NSRightArrowFunctionKey:
       keyDownList.remove(NSRightArrowFunctionKey)
+      
+    case Int((String("w").unicodeScalars.first?.value)!):
+      keyDownList.remove(NSUpArrowFunctionKey)
+    case Int((String("s").unicodeScalars.first?.value)!):
+      keyDownList.remove(NSDownArrowFunctionKey)
+    case Int((String("a").unicodeScalars.first?.value)!):
+      keyDownList.remove(NSLeftArrowFunctionKey)
+    case Int((String("d").unicodeScalars.first?.value)!):
+      keyDownList.remove(NSRightArrowFunctionKey)
+      
+    case Int((String("=").unicodeScalars.first?.value)!):
+      keyDownList.remove(Int((String("=").unicodeScalars.first?.value)!))
+    case Int((String("-").unicodeScalars.first?.value)!):
+      keyDownList.remove(Int((String("+").unicodeScalars.first?.value)!))
     default:
       super.keyUp(event)
     }
   }
   
   override func moveUp(sender: AnyObject?) {
-    centerCoordinate.longitude += moveDelta * sin(Double(heading)*M_PI/180.0)
-    centerCoordinate.latitude += moveDelta * cos(Double(heading)*M_PI/180.0)
+    let scaleFactor = 1500.0 / mapView.camera.altitude
+    centerCoordinate.longitude += moveDelta * sin(Double(heading)*M_PI/180.0) / scaleFactor
+    centerCoordinate.latitude += moveDelta * cos(Double(heading)*M_PI/180.0) / scaleFactor
     updateCamera()
   }
 
   override func moveDown(sender: AnyObject?) {
-    centerCoordinate.longitude -= moveDelta * sin(Double(heading)*M_PI/180.0)
-    centerCoordinate.latitude -= moveDelta * cos(Double(heading)*M_PI/180.0)
+    let scaleFactor = 1500.0 / mapView.camera.altitude
+    centerCoordinate.longitude -= moveDelta * sin(Double(heading)*M_PI/180.0) / scaleFactor
+    centerCoordinate.latitude -= moveDelta * cos(Double(heading)*M_PI/180.0) / scaleFactor
     updateCamera()
   }
 
   override func moveLeft(sender: AnyObject?) {
-    heading -= headingDelta
+    heading -= headingDelta / 5.0
     updateCamera()
   }
 
   override func moveRight(sender: AnyObject?) {
-    heading += headingDelta
+    heading += headingDelta / 5.0
     updateCamera()
   }
 }
