@@ -145,13 +145,11 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     }
   }
   
-  override func keyDown(event: NSEvent) {
+  func handleKeyDown(event: NSEvent) {
     guard let characters = event.charactersIgnoringModifiers else {
-      super.keyDown(event)
       return
     }
     guard let keyValue = characters.unicodeScalars.first?.value else {
-      super.keyDown(event)
       return
     }
     switch (Int(keyValue)) {
@@ -178,19 +176,16 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     case Int((String("-").unicodeScalars.first?.value)!):
       keyDownList.insert(Int((String("+").unicodeScalars.first?.value)!))
     default:
-      super.keyDown(event)
       return
     }
     dispatchKeyHandler()
   }
   
-  override func keyUp(event: NSEvent) {
+  func handleKeyUp(event: NSEvent) {
     guard let characters = event.charactersIgnoringModifiers else {
-      super.keyUp(event)
       return
     }
     guard let keyValue = characters.unicodeScalars.first?.value else {
-      super.keyUp(event)
       return
     }
     switch (Int(keyValue)) {
@@ -217,7 +212,7 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     case Int((String("-").unicodeScalars.first?.value)!):
       keyDownList.remove(Int((String("+").unicodeScalars.first?.value)!))
     default:
-      super.keyUp(event)
+        break;
     }
   }
   
