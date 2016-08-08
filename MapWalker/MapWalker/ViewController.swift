@@ -68,6 +68,10 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
 
   func executeApplyGPXScript() {
     let path = NSBundle.mainBundle().pathForResource("ApplyGPX", ofType: "scpt")
+    if path == nil {
+      print("Script not found.")
+      return
+    }
     let url = NSURL(fileURLWithPath: path!)
     var errorDict:NSDictionary? = nil
     let appleScript = NSAppleScript(contentsOfURL: url, error: &errorDict)
@@ -123,6 +127,14 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     keyHandlerDispatched = true
     dispatch_async(dispatch_get_main_queue()) {
       self.keyHandler()
+    }
+  }
+    
+  func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+    if (abs(mapView.centerCoordinate.latitude - centerCoordinate.latitude) > 0.00001
+       || abs(mapView.centerCoordinate.longitude - centerCoordinate.longitude) > 0.00001) {
+      centerCoordinate = mapView.centerCoordinate
+      updateCamera()
     }
   }
   
