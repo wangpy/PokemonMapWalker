@@ -8,6 +8,12 @@ This project is inspired from kahopoon's [Pokemon-Go-Controller](https://github.
   - AppleScript (ApplyGPX.scpt) is used to apply GPX script to location simulator.
 
 ### How to use it
+  - Move by keyboard
+    - https://www.youtube.com/watch?v=Xvyb-MKgKq0
+  - Move by dragging - Thanks to Johnny Sung (j796160836)[https://github.com/j796160836]
+    - https://www.youtube.com/watch?v=TjmW9-Vz7TI
+
+### How to set up
   - Download **Xcode** from Mac App Store
   - Download the project as zip and extract
   - Open `MapWalker/MapWalker.xcodeproj` and **Run** the project
@@ -37,6 +43,9 @@ Troubleshooting
     - Single-click on the first item in project navigator
   - Make sure Xcode is allowed to control your computer in **Settings** -> **Security & Privacy** -> **Accessibility**.
   - Make sure LocationSimulation project is running on your device and **is run from Xcode**
+  - Try to activate location yourself in Location Simulation project, then switch back to MapWalker app
+    - In Xcode LocationSimulation project window, click **Debug** -> **Simulate Location** -> Select **MapWalker**
+  - Try to delete MapWalker.gpx in LocationSimulation project (click "Remove Reference") and add again.
 
 License
 ----
