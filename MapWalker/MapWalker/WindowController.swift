@@ -12,7 +12,7 @@ class WindowController : NSWindowController {
   
   override func keyDown(event: NSEvent) {
     if let viewController = contentViewController as? ViewController {
-      viewController.keyDown(event)
+      viewController.handleKeyDown(event)
       return
     }
     super.keyDown(event)
@@ -20,7 +20,7 @@ class WindowController : NSWindowController {
 
   override func keyUp(event: NSEvent) {
     if let viewController = contentViewController as? ViewController {
-      viewController.keyUp(event)
+      viewController.handleKeyUp(event)
       return
     }
     super.keyUp(event)
