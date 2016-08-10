@@ -11,7 +11,7 @@ import MapKit
 import Dispatch
 
 class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDelegate {
-
+  internal let defaultLocationCoordinate = CLLocationCoordinate2D(latitude: 25.033680, longitude: 121.564548) // Location of Taipei 101
   let headingDelta:CLLocationDirection = 3.0
   let moveDelta:CLLocationDegrees = 0.0001
   
@@ -22,6 +22,8 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
   
   var keyDownList = Set<Int>(minimumCapacity: 10)
   var keyHandlerDispatched:Bool = false
+    
+  var timer:NSTimer?
   
   @IBOutlet weak var mapView: MKMapView!
   
@@ -35,6 +37,8 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     locationManager.desiredAccuracy = kCLLocationAccuracyBest
     locationManager.startUpdatingLocation()
     
+    timer = NSTimer.scheduledTimerWithTimeInterval(5, target: self, selector: #selector(ViewController.applyDefaultCoordinate), userInfo: nil, repeats: false)
+    
     mapView.showsBuildings = true
     mapView.mapType = .Standard
   }
@@ -44,16 +48,29 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     // Update the view, if already loaded.
     }
   }
+    
+  func applyDefaultCoordinate() {
+    locationManager.stopUpdatingLocation()
+    centerCoordinate = defaultLocationCoordinate
+    userLocationCoordinate = defaultLocationCoordinate
+    print("applyDefaultCoordinate lat:\(centerCoordinate.latitude) lng:\(centerCoordinate.longitude)")
+    initializeMap()
+  }
 
   func locationManager(manager: CLLocationManager, didUpdateToLocation newLocation: CLLocation, fromLocation oldLocation: CLLocation) {
     locationManager.stopUpdatingLocation()
 
+    timer?.invalidate()
     centerCoordinate = newLocation.coordinate
     /*
     let viewRegion = MKCoordinateRegionMake(centerCoordinate, MKCoordinateSpan(latitudeDelta: 0.001, longitudeDelta: 0.001))
     let adjustedRegion = mapView.regionThatFits(viewRegion)
     mapView.setRegion(adjustedRegion, animated: true)
  */
+     initializeMap()
+  }
+    
+  func initializeMap() {
     updateCamera(false)
     let url = NSURL(fileURLWithPath: "MapWalker.gpx")
     let folderUrl = url.URLByDeletingLastPathComponent
