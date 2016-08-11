@@ -11,17 +11,20 @@ import MapKit
 import Dispatch
 
 class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDelegate {
-
+  internal let defaultLocationCoordinate = CLLocationCoordinate2D(latitude: 25.033680, longitude: 121.564548) // Location of Taipei 101
   let headingDelta:CLLocationDirection = 3.0
   let moveDelta:CLLocationDegrees = 0.0001
   
   var heading:CLLocationDirection = 0.0
-  var centerCoordinate = CLLocationCoordinate2D()
-
+  internal var centerCoordinate = CLLocationCoordinate2D()
+  internal var userLocationCoordinate = CLLocationCoordinate2D()
+    
   let locationManager = CLLocationManager()
   
   var keyDownList = Set<Int>(minimumCapacity: 10)
   var keyHandlerDispatched:Bool = false
+    
+  var timer:NSTimer?
   
   @IBOutlet weak var mapView: MKMapView!
   
@@ -35,6 +38,8 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     locationManager.desiredAccuracy = kCLLocationAccuracyBest
     locationManager.startUpdatingLocation()
     
+    timer = NSTimer.scheduledTimerWithTimeInterval(5, target: self, selector: #selector(ViewController.applyDefaultCoordinate), userInfo: nil, repeats: false)
+    
     mapView.showsBuildings = true
     mapView.mapType = .Standard
   }
@@ -44,16 +49,30 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     // Update the view, if already loaded.
     }
   }
+    
+  func applyDefaultCoordinate() {
+    locationManager.stopUpdatingLocation()
+    centerCoordinate = defaultLocationCoordinate
+    userLocationCoordinate = defaultLocationCoordinate
+    print("applyDefaultCoordinate lat:\(centerCoordinate.latitude) lng:\(centerCoordinate.longitude)")
+    initializeMap()
+  }
 
   func locationManager(manager: CLLocationManager, didUpdateToLocation newLocation: CLLocation, fromLocation oldLocation: CLLocation) {
     locationManager.stopUpdatingLocation()
 
+    timer?.invalidate()
+    userLocationCoordinate = newLocation.coordinate
     centerCoordinate = newLocation.coordinate
     /*
     let viewRegion = MKCoordinateRegionMake(centerCoordinate, MKCoordinateSpan(latitudeDelta: 0.001, longitudeDelta: 0.001))
     let adjustedRegion = mapView.regionThatFits(viewRegion)
     mapView.setRegion(adjustedRegion, animated: true)
  */
+     initializeMap()
+  }
+    
+  func initializeMap() {
     updateCamera(false)
     let url = NSURL(fileURLWithPath: "MapWalker.gpx")
     let folderUrl = url.URLByDeletingLastPathComponent
@@ -122,6 +141,10 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     if (keyDownList.contains(NSRightArrowFunctionKey)) {
       moveRight(nil)
     }
+    if (keyDownList.contains(Int((String(" ").unicodeScalars.first?.value)!))) {
+      updateCamera()
+    }
+    
     dispatch_async(dispatch_get_main_queue()) { 
       self.keyHandler()
     }
@@ -146,6 +169,7 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
   }
   
   func handleKeyDown(event: NSEvent) {
+    
     guard let characters = event.charactersIgnoringModifiers else {
       return
     }
@@ -175,6 +199,9 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
       keyDownList.insert(Int((String("=").unicodeScalars.first?.value)!))
     case Int((String("-").unicodeScalars.first?.value)!):
       keyDownList.insert(Int((String("+").unicodeScalars.first?.value)!))
+        
+    case Int((String(" ").unicodeScalars.first?.value)!):
+      keyDownList.insert(Int((String(" ").unicodeScalars.first?.value)!))
     default:
       return
     }
@@ -211,9 +238,27 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
       keyDownList.remove(Int((String("=").unicodeScalars.first?.value)!))
     case Int((String("-").unicodeScalars.first?.value)!):
       keyDownList.remove(Int((String("+").unicodeScalars.first?.value)!))
+        
+    case Int((String(" ").unicodeScalars.first?.value)!):
+      keyDownList.remove(Int((String(" ").unicodeScalars.first?.value)!))
     default:
-        break;
+      break;
     }
+  }
+    
+  internal func handleJumpToLocation(coordinate: CLLocationCoordinate2D) {
+    centerCoordinate = coordinate
+    updateCamera()
+  }
+    
+  internal func handleMarkItLocation(coordinate: CLLocationCoordinate2D) {
+    let num = mapView.annotations.count + 1
+    let mapPin = MapPin.init(coordinate: coordinate, title: "Location \(num)", subtitle: "Latitude:\(centerCoordinate.latitude)\nLongitude:\(centerCoordinate.longitude)")
+    mapView.addAnnotation(mapPin)
+  }
+    
+  internal func handleRemoveAllPins() {
+    mapView.removeAnnotations(mapView.annotations)
   }
   
   override func moveUp(sender: AnyObject?) {
@@ -237,6 +282,10 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
 
   override func moveRight(sender: AnyObject?) {
     heading += headingDelta
+    updateCamera()
+  }
+  
+  @IBAction func roundButtonClick(sender: AnyObject) {
     updateCamera()
   }
 }
