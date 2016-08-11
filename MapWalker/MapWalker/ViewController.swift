@@ -16,8 +16,9 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
   let moveDelta:CLLocationDegrees = 0.0001
   
   var heading:CLLocationDirection = 0.0
-  var centerCoordinate = CLLocationCoordinate2D()
-
+  internal var centerCoordinate = CLLocationCoordinate2D()
+  internal var userLocationCoordinate = CLLocationCoordinate2D()
+    
   let locationManager = CLLocationManager()
   
   var keyDownList = Set<Int>(minimumCapacity: 10)
@@ -61,6 +62,7 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     locationManager.stopUpdatingLocation()
 
     timer?.invalidate()
+    userLocationCoordinate = newLocation.coordinate
     centerCoordinate = newLocation.coordinate
     /*
     let viewRegion = MKCoordinateRegionMake(centerCoordinate, MKCoordinateSpan(latitudeDelta: 0.001, longitudeDelta: 0.001))
@@ -139,6 +141,10 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     if (keyDownList.contains(NSRightArrowFunctionKey)) {
       moveRight(nil)
     }
+    if (keyDownList.contains(Int((String(" ").unicodeScalars.first?.value)!))) {
+      updateCamera()
+    }
+    
     dispatch_async(dispatch_get_main_queue()) { 
       self.keyHandler()
     }
@@ -163,6 +169,7 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
   }
   
   func handleKeyDown(event: NSEvent) {
+    
     guard let characters = event.charactersIgnoringModifiers else {
       return
     }
@@ -192,6 +199,9 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
       keyDownList.insert(Int((String("=").unicodeScalars.first?.value)!))
     case Int((String("-").unicodeScalars.first?.value)!):
       keyDownList.insert(Int((String("+").unicodeScalars.first?.value)!))
+        
+    case Int((String(" ").unicodeScalars.first?.value)!):
+      keyDownList.insert(Int((String(" ").unicodeScalars.first?.value)!))
     default:
       return
     }
@@ -228,9 +238,27 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
       keyDownList.remove(Int((String("=").unicodeScalars.first?.value)!))
     case Int((String("-").unicodeScalars.first?.value)!):
       keyDownList.remove(Int((String("+").unicodeScalars.first?.value)!))
+        
+    case Int((String(" ").unicodeScalars.first?.value)!):
+      keyDownList.remove(Int((String(" ").unicodeScalars.first?.value)!))
     default:
-        break;
+      break;
     }
+  }
+    
+  internal func handleJumpToLocation(coordinate: CLLocationCoordinate2D) {
+    centerCoordinate = coordinate
+    updateCamera()
+  }
+    
+  internal func handleMarkItLocation(coordinate: CLLocationCoordinate2D) {
+    let num = mapView.annotations.count + 1
+    let mapPin = MapPin.init(coordinate: coordinate, title: "Location \(num)", subtitle: "Latitude:\(centerCoordinate.latitude)\nLongitude:\(centerCoordinate.longitude)")
+    mapView.addAnnotation(mapPin)
+  }
+    
+  internal func handleRemoveAllPins() {
+    mapView.removeAnnotations(mapView.annotations)
   }
   
   override func moveUp(sender: AnyObject?) {
@@ -254,6 +282,10 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
 
   override func moveRight(sender: AnyObject?) {
     heading += headingDelta
+    updateCamera()
+  }
+  
+  @IBAction func roundButtonClick(sender: AnyObject) {
     updateCamera()
   }
 }
