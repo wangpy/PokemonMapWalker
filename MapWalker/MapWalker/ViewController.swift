@@ -12,8 +12,8 @@ import Dispatch
 
 class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDelegate {
 
-  let headingDelta:CLLocationDirection = 3.0
-  let moveDelta:CLLocationDegrees = 0.0001
+  let headingDelta:CLLocationDirection = 0.2
+  let moveDelta:CLLocationDegrees = 0.000001
   
   var heading:CLLocationDirection = 0.0
   var centerCoordinate = CLLocationCoordinate2D()
@@ -23,13 +23,21 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
   var keyDownList = Set<Int>(minimumCapacity: 10)
   var keyHandlerDispatched:Bool = false
   
+  let makeGpxQueue:dispatch_queue_t = dispatch_queue_create("com.example.MyQueue1", nil)
+  let runGpxQueue:dispatch_queue_t = dispatch_queue_create("com.example.MyQueue2", nil)
+  var scriptExecutionQueued:Bool = false
+  var makeGpxFileQueued:Bool = false
+  var applyGpxScript:NSAppleScript!
+
   @IBOutlet weak var mapView: MKMapView!
   
   override func viewDidLoad() {
     super.viewDidLoad()
 
     // Do any additional setup after loading the view.
-    
+
+    prepareApplyGpxScript()
+
     // Get user location
     locationManager.delegate = self
     locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -55,6 +63,7 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     mapView.setRegion(adjustedRegion, animated: true)
  */
     updateCamera(false)
+    makeGpxFile()
     let url = NSURL(fileURLWithPath: "MapWalker.gpx")
     let folderUrl = url.URLByDeletingLastPathComponent
     NSWorkspace.sharedWorkspace().openURL(folderUrl!)
@@ -70,38 +79,76 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
                              pitch: 45,
                              heading: heading)
     mapView.camera = camera
-    makeGPXFile()
+    postMakeGpxFileTask()
   }
 
-  func executeApplyGPXScript() {
+  func synchronized(lock:AnyObject, @noescape closure: () -> ()) {
+    objc_sync_enter(lock)
+    closure()
+    objc_sync_exit(lock)
+  }
+  
+  func prepareApplyGpxScript() {
     let path = NSBundle.mainBundle().pathForResource("ApplyGPX", ofType: "scpt")
     if path == nil {
-      print("Script not found.")
+      assertionFailure("Script not found.")
       return
     }
     let url = NSURL(fileURLWithPath: path!)
     var errorDict:NSDictionary? = nil
-    let appleScript = NSAppleScript(contentsOfURL: url, error: &errorDict)
+    self.applyGpxScript = NSAppleScript(contentsOfURL: url, error: &errorDict)
     if errorDict != nil {
-      print("Error creating AppleScript: \(errorDict?.description)")
-      return
-    }
-    appleScript?.executeAndReturnError(&errorDict)
-    if errorDict != nil {
-      print("Error executing AppleScript: \(errorDict?.description)")
+      assertionFailure("Error creating AppleScript: \(errorDict?.description)")
       return
     }
   }
   
-  func makeGPXFile() {
+  func postApplyGpxScriptTask() {
+    synchronized(self) {
+      if !scriptExecutionQueued {
+        scriptExecutionQueued = true
+        dispatch_async(runGpxQueue) {
+          self.executeApplyGpxScript()
+        }
+      }
+    }
+  }
+  
+  func executeApplyGpxScript() {
+    var errorDict:NSDictionary? = nil
+    print("executing AppleScript")
+    applyGpxScript.executeAndReturnError(&errorDict)
+    if errorDict != nil {
+      print("Error executing AppleScript: \(errorDict?.description)")
+    } else {
+      print("AppleScript execution completed")
+    }
+    scriptExecutionQueued = false
+  }
+  
+  func postMakeGpxFileTask() {
+    synchronized(self) {
+      if !makeGpxFileQueued {
+        makeGpxFileQueued = true
+        dispatch_async(makeGpxQueue) {
+          self.makeGpxFile()
+        }
+      }
+    }
+  }
+  
+  
+  func makeGpxFile() {
     let fileContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><gpx version=\"1.0\"><name>Example gpx</name><wpt lat=\"\(centerCoordinate.latitude)\" lon=\"\(centerCoordinate.longitude)\"><name>WP</name></wpt></gpx>"
     do {
       try fileContent.writeToFile("MapWalker.gpx", atomically: true, encoding: NSUTF8StringEncoding)
-      executeApplyGPXScript()
+      print("written GPX file with Location (\(centerCoordinate.latitude), \(centerCoordinate.longitude))")
+      self.postApplyGpxScriptTask()
     } catch {
       // do nothing
       print("error writing file")
     }
+    makeGpxFileQueued = false
   }
   
   func keyHandler() {
