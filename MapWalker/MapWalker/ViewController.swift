@@ -23,8 +23,8 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
   var keyDownList = Set<Int>(minimumCapacity: 10)
   var keyHandlerDispatched:Bool = false
   
-  let makeGpxQueue:dispatch_queue_t = dispatch_queue_create("com.example.MyQueue1", nil)
-  let runGpxQueue:dispatch_queue_t = dispatch_queue_create("com.example.MyQueue2", nil)
+  let makeGpxQueue:DispatchQueue = DispatchQueue.init(label: "com.example.MyQueue1")
+  let runGpxQueue:DispatchQueue = DispatchQueue.init(label: "com.example.MyQueue2")
   var scriptExecutionQueued:Bool = false
   var makeGpxFileQueued:Bool = false
   var applyGpxScript:NSAppleScript!
@@ -44,16 +44,16 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     locationManager.startUpdatingLocation()
     
     mapView.showsBuildings = true
-    mapView.mapType = .Standard
+    mapView.mapType = .standard
   }
 
-  override var representedObject: AnyObject? {
+  override var representedObject: Any? {
     didSet {
     // Update the view, if already loaded.
     }
   }
 
-  func locationManager(manager: CLLocationManager, didUpdateToLocation newLocation: CLLocation, fromLocation oldLocation: CLLocation) {
+  func locationManager(_ manager: CLLocationManager, didUpdateTo newLocation: CLLocation, from oldLocation: CLLocation) {
     locationManager.stopUpdatingLocation()
 
     centerCoordinate = newLocation.coordinate
@@ -62,11 +62,11 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     let adjustedRegion = mapView.regionThatFits(viewRegion)
     mapView.setRegion(adjustedRegion, animated: true)
  */
-    updateCamera(false)
+    updateCamera(mapInitialized: false)
     makeGpxFile()
     let url = NSURL(fileURLWithPath: "MapWalker.gpx")
-    let folderUrl = url.URLByDeletingLastPathComponent
-    NSWorkspace.sharedWorkspace().openURL(folderUrl!)
+    let folderUrl = url.deletingLastPathComponent
+    NSWorkspace.shared().open(folderUrl!)
   }
 
   func updateCamera(mapInitialized:Bool = true) {
@@ -74,7 +74,7 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     if mapInitialized {
         distance = mapView.camera.altitude / cos(M_PI*(Double(mapView.camera.pitch)/180.0))
     }
-    let camera = MKMapCamera(lookingAtCenterCoordinate: centerCoordinate,
+    let camera = MKMapCamera(lookingAtCenter: centerCoordinate,
                              fromDistance: distance,
                              pitch: 45,
                              heading: heading)
@@ -82,21 +82,21 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     postMakeGpxFileTask()
   }
 
-  func synchronized(lock:AnyObject, @noescape closure: () -> ()) {
+  func synchronized(lock:AnyObject, closure: () -> ()) {
     objc_sync_enter(lock)
     closure()
     objc_sync_exit(lock)
   }
   
   func prepareApplyGpxScript() {
-    let path = NSBundle.mainBundle().pathForResource("ApplyGPX", ofType: "scpt")
+    let path = Bundle.main.path(forResource: "ApplyGPX", ofType: "scpt")
     if path == nil {
       assertionFailure("Script not found.")
       return
     }
     let url = NSURL(fileURLWithPath: path!)
     var errorDict:NSDictionary? = nil
-    self.applyGpxScript = NSAppleScript(contentsOfURL: url, error: &errorDict)
+    self.applyGpxScript = NSAppleScript(contentsOf: url as URL, error: &errorDict)
     if errorDict != nil {
       assertionFailure("Error creating AppleScript: \(errorDict?.description)")
       return
@@ -104,10 +104,10 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
   }
   
   func postApplyGpxScriptTask() {
-    synchronized(self) {
+    synchronized(lock: self) {
       if !scriptExecutionQueued {
         scriptExecutionQueued = true
-        dispatch_async(runGpxQueue) {
+        runGpxQueue.async {
           self.executeApplyGpxScript()
         }
       }
@@ -127,10 +127,10 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
   }
   
   func postMakeGpxFileTask() {
-    synchronized(self) {
+    synchronized(lock: self) {
       if !makeGpxFileQueued {
         makeGpxFileQueued = true
-        dispatch_async(makeGpxQueue) {
+        makeGpxQueue.async {
           self.makeGpxFile()
         }
       }
@@ -141,7 +141,7 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
   func makeGpxFile() {
     let fileContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><gpx version=\"1.0\"><name>Example gpx</name><wpt lat=\"\(centerCoordinate.latitude)\" lon=\"\(centerCoordinate.longitude)\"><name>WP</name></wpt></gpx>"
     do {
-      try fileContent.writeToFile("MapWalker.gpx", atomically: true, encoding: NSUTF8StringEncoding)
+      try fileContent.write(toFile: "MapWalker.gpx", atomically: true, encoding: String.Encoding.utf8)
       print("written GPX file with Location (\(centerCoordinate.latitude), \(centerCoordinate.longitude))")
       self.postApplyGpxScriptTask()
     } catch {
@@ -158,18 +158,18 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     }
     
     if (keyDownList.contains(NSUpArrowFunctionKey)) {
-      moveUp(nil)
+      moveUp()
     }
     if (keyDownList.contains(NSDownArrowFunctionKey)) {
-      moveDown(nil)
+      moveDown()
     }
     if (keyDownList.contains(NSLeftArrowFunctionKey)) {
-      moveLeft(nil)
+      moveLeft()
     }
     if (keyDownList.contains(NSRightArrowFunctionKey)) {
-      moveRight(nil)
+      moveRight()
     }
-    dispatch_async(dispatch_get_main_queue()) { 
+    DispatchQueue.main.async {
       self.keyHandler()
     }
   }
@@ -179,12 +179,12 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
       return
     }
     keyHandlerDispatched = true
-    dispatch_async(dispatch_get_main_queue()) {
+    DispatchQueue.main.async {
       self.keyHandler()
     }
   }
     
-  func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+  func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
     if (abs(mapView.centerCoordinate.latitude - centerCoordinate.latitude) > 0.00001
        || abs(mapView.centerCoordinate.longitude - centerCoordinate.longitude) > 0.00001) {
       centerCoordinate = mapView.centerCoordinate
@@ -263,26 +263,26 @@ class ViewController: NSViewController, MKMapViewDelegate, CLLocationManagerDele
     }
   }
   
-  override func moveUp(sender: AnyObject?) {
+  func moveUp() {
     let scaleFactor = 1500.0 / mapView.camera.altitude
     centerCoordinate.longitude += moveDelta * sin(Double(heading)*M_PI/180.0) / scaleFactor
     centerCoordinate.latitude += moveDelta * cos(Double(heading)*M_PI/180.0) / scaleFactor
     updateCamera()
   }
 
-  override func moveDown(sender: AnyObject?) {
+  func moveDown() {
     let scaleFactor = 1500.0 / mapView.camera.altitude
     centerCoordinate.longitude -= moveDelta * sin(Double(heading)*M_PI/180.0) / scaleFactor
     centerCoordinate.latitude -= moveDelta * cos(Double(heading)*M_PI/180.0) / scaleFactor
     updateCamera()
   }
 
-  override func moveLeft(sender: AnyObject?) {
+  func moveLeft() {
     heading -= headingDelta
     updateCamera()
   }
 
-  override func moveRight(sender: AnyObject?) {
+  func moveRight() {
     heading += headingDelta
     updateCamera()
   }

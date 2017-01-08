@@ -10,19 +10,19 @@ import Cocoa
 
 class WindowController : NSWindowController {
   
-  override func keyDown(event: NSEvent) {
+  override func keyDown(with event: NSEvent) {
     if let viewController = contentViewController as? ViewController {
-      viewController.handleKeyDown(event)
+      viewController.handleKeyDown(event: event)
       return
     }
-    super.keyDown(event)
+    super.keyDown(with: event)
   }
 
-  override func keyUp(event: NSEvent) {
+  override func keyUp(with event: NSEvent) {
     if let viewController = contentViewController as? ViewController {
-      viewController.handleKeyUp(event)
+      viewController.handleKeyUp(event: event)
       return
     }
-    super.keyUp(event)
+    super.keyUp(with: event)
   }
 }
