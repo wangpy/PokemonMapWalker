@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C71FC5B81E22854500BE39F9 /* MapWalker.gpx in Resources */ = {isa = PBXBuildFile; fileRef = C71FC5B71E22854500BE39F9 /* MapWalker.gpx */; };
 		E1E0187F1D577842009EFBDF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E0187E1D577842009EFBDF /* AppDelegate.swift */; };
 		E1E018811D577842009EFBDF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E018801D577842009EFBDF /* ViewController.swift */; };
 		E1E018841D577842009EFBDF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E1E018821D577842009EFBDF /* Main.storyboard */; };
@@ -34,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C71FC5B71E22854500BE39F9 /* MapWalker.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = MapWalker.gpx; path = "../../../Library/Developer/Xcode/DerivedData/MapWalker-caqqdihnumnnjbesioouqqyueiny/Build/Products/Debug/MapWalker.gpx"; sourceTree = "<group>"; };
 		E1E0187B1D577842009EFBDF /* LocationSimulation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LocationSimulation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1E0187E1D577842009EFBDF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E1E018801D577842009EFBDF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -81,6 +83,7 @@
 				E1E018921D577842009EFBDF /* LocationSimulationTests */,
 				E1E0189D1D577843009EFBDF /* LocationSimulationUITests */,
 				E1E0187C1D577842009EFBDF /* Products */,
+				C71FC5B71E22854500BE39F9 /* MapWalker.gpx */,
 			);
 			sourceTree = "<group>";
 		};
@@ -188,18 +191,22 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = MapWalker;
 				TargetAttributes = {
 					E1E0187A1D577842009EFBDF = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = 9R4N7NTTLA;
+						LastSwiftMigration = 0820;
 					};
 					E1E0188E1D577842009EFBDF = {
 						CreatedOnToolsVersion = 7.3.1;
+						LastSwiftMigration = 0820;
 						TestTargetID = E1E0187A1D577842009EFBDF;
 					};
 					E1E018991D577843009EFBDF = {
 						CreatedOnToolsVersion = 7.3.1;
+						LastSwiftMigration = 0820;
 						TestTargetID = E1E0187A1D577842009EFBDF;
 					};
 				};
@@ -231,6 +238,7 @@
 			files = (
 				E1E018891D577842009EFBDF /* LaunchScreen.storyboard in Resources */,
 				E1E018861D577842009EFBDF /* Assets.xcassets in Resources */,
+				C71FC5B81E22854500BE39F9 /* MapWalker.gpx in Resources */,
 				E1E018841D577842009EFBDF /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -326,8 +334,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -372,8 +382,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -392,6 +404,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -401,11 +414,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 9R4N7NTTLA;
 				INFOPLIST_FILE = LocationSimulation/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapwalker.LocationSimulation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -413,11 +428,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 9R4N7NTTLA;
 				INFOPLIST_FILE = LocationSimulation/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapwalker.LocationSimulation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -429,6 +446,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapwalker.LocationSimulationTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LocationSimulation.app/LocationSimulation";
 			};
 			name = Debug;
@@ -441,6 +459,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapwalker.LocationSimulationTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LocationSimulation.app/LocationSimulation";
 			};
 			name = Release;
@@ -452,6 +471,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapwalker.LocationSimulationUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = LocationSimulation;
 			};
 			name = Debug;
@@ -463,6 +483,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapwalker.LocationSimulationUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = LocationSimulation;
 			};
 			name = Release;
